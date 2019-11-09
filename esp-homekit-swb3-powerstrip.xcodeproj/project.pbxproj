@@ -6,10 +6,17 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXFileReference section */
+		5502D58823772975006E62E4 /* src */ = {isa = PBXFileReference; lastKnownFileType = folder; path = src; sourceTree = "<group>"; };
+		5502D58923772985006E62E4 /* components */ = {isa = PBXFileReference; lastKnownFileType = folder; path = components; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		5581F07B237726C1003150D1 = {
 			isa = PBXGroup;
 			children = (
+				5502D58923772985006E62E4 /* components */,
+				5502D58823772975006E62E4 /* src */,
 			);
 			sourceTree = "<group>";
 		};
@@ -23,10 +30,11 @@
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "/Volumes/case-sensitive/esp-homekit-swb3-powerstrip/src";
 			dependencies = (
 			);
 			name = "esp-homekit-swb3-powerstrip";
-			passBuildSettingsInEnvironment = 1;
+			passBuildSettingsInEnvironment = 0;
 			productName = "esp-homekit-swb3-powerstrip";
 		};
 /* End PBXLegacyTarget section */
@@ -146,6 +154,7 @@
 		5581F084237726C1003150D1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BIN_PATH = "/volumes/case-sensitive/esp-open-sdk/ESP8266_RTOS_SDK/bin";
 				DEBUGGING_SYMBOLS = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = BPHS6ZKLL9;
@@ -153,18 +162,23 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PATH = "/volumes/case-sensitive/esp-open-sdk/xtensa-lx106-elf/bin:/usr/local/opt/gnu-sed/bin:$PATH";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDK_PATH = "/volumes/case-sensitive/esp-open-rtos";
 			};
 			name = Debug;
 		};
 		5581F085237726C1003150D1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BIN_PATH = "/volumes/case-sensitive/esp-open-sdk/ESP8266_RTOS_SDK/bin";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = BPHS6ZKLL9;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
+				PATH = "/volumes/case-sensitive/esp-open-sdk/xtensa-lx106-elf/bin:/usr/local/opt/gnu-sed/bin:$PATH";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDK_PATH = "/volumes/case-sensitive/esp-open-rtos";
 			};
 			name = Release;
 		};
@@ -187,6 +201,7 @@
 				5581F085237726C1003150D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
