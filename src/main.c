@@ -195,6 +195,7 @@ homekit_accessory_t *accessories[] = {
             HOMEKIT_CHARACTERISTIC(NAME, "Socket 1"),
             &socket_one,
             &ota_trigger,
+            &wifi_reset,
             NULL
         }),
         HOMEKIT_SERVICE(SWITCH, .primary=false, .characteristics=(homekit_characteristic_t*[]){
@@ -218,6 +219,11 @@ homekit_accessory_t *accessories[] = {
 };
 
 
+void accessory_init (void ){
+/* initalise anything you don't want started until wifi and pairing is confirmed */
+    
+}
+
 homekit_server_config_t config = {
     .accessories = accessories,
     .password = "111-11-111",
@@ -226,25 +232,11 @@ homekit_server_config_t config = {
 };
 
 
-void accessory_init (void ){
-/* initalise anything you don't want started until wifi and pairing is confirmed */
-    
-}
-
-
 void user_init(void) {
-    uart_set_baud(0, 115200);
-    
-    udplog_init(3);
-    get_sysparam_info();
-    gpio_init();
-    
-    create_accessory_name(DEVICE_NAME, DEVICE_MODEL, name, serial);
 
-    int c_hash=ota_read_sysparam(&manufacturer.value.string_value,&serial.value.string_value,
-                                 &model.value.string_value,&revision.value.string_value);
-    if (c_hash==0) c_hash=1;
-    config.accessories[0]->config_number=c_hash;
-    
-    homekit_server_init(&config);
+    standard_init (&name, &manufacturer, &model, &serial, &revision);
+
+    gpio_init();
+
+    wifi_config_init("AirQualitySensor", NULL, on_wifi_ready);
 }
