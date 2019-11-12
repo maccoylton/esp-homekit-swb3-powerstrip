@@ -13,7 +13,8 @@ EXTRA_COMPONENTS = \
 	$(abspath ../components/esp-wifi-config) \
     $(abspath ../components/esp-homekit-common-functions/led_codes)\
     $(abspath ../components/esp-homekit-common-functions/ota)\
-    $(abspath ../components/esp-homekit-common-functions/custom_characteristics)
+    $(abspath ../components/esp-homekit-common-functions/custom_characteristics)\
+    $(abspath ../components/esp-homekit-common-functions/shared_functions)
 
 
 FLASH_SIZE ?= 8
@@ -30,6 +31,7 @@ EXTRA_CFLAGS += -I../.. -DHOMEKIT_SHORT_APPLE_UUIDS
 EXTRA_CFLAGS += -DHOMEKIT_OVERCLOCK_PAIR_VERIFY
 EXTRA_CFLAGS += -DHOMEKIT_OVERCLOCK_PAIR_SETUP
 EXTRA_CFLAGS += -DUDPLOG_PRINTF_TO_UDP
+EXTRA_CFLAGS += -DUDPLOG_PRINTF_ALSO_SERIAL
 
 
 include $(SDK_PATH)/common.mk
