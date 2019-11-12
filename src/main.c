@@ -111,12 +111,11 @@ void socket_usb_callback (homekit_characteristic_t *_ch, homekit_value_t on, voi
 void button_single_press_callback(uint8_t gpio, void* args, uint8_t param) {
     
     printf("Button event single press on GPIO : %d\n", gpio);
-/*    printf("Toggling relay\n");
-    switch_on.value.bool_value = !switch_on.value.bool_value;
-    relay_write(switch_on.value.bool_value);
-    led_write(switch_on.value.bool_value);
-    homekit_characteristic_notify(&switch_on, switch_on.value);
- */
+    printf("Toggling switch one\n");
+    socket_one.value.bool_value = !socket_one.value.bool_value;
+    relay_write(socket_one.value.bool_value, SOCKET_ONE_GPIO);
+    homekit_characteristic_notify(&socket_one, socket_one.value);
+
     
 }
 
@@ -125,6 +124,20 @@ void button_double_press_callback(uint8_t gpio, void* args, uint8_t param) {
     
     printf("Button event double press on GPIO : %d\n", gpio);
     
+    printf("Toggling socket one\n");
+    socket_one.value.bool_value = !socket_one.value.bool_value;
+    relay_write(socket_one.value.bool_value, SOCKET_ONE_GPIO);
+    homekit_characteristic_notify(&socket_one, socket_one.value);
+
+    printf("Toggling socket two\n");
+    socket_two.value.bool_value = !socket_two.value.bool_value;
+    relay_write(socket_two.value.bool_value, SOCKET_TWO_GPIO);
+    homekit_characteristic_notify(&socket_two, socket_two.value);
+
+    printf("Toggling socket three\n");
+    socket_three.value.bool_value = !socket_three.value.bool_value;
+    relay_write(socket_three.value.bool_value, SOCKET_THREE_GPIO);
+    homekit_characteristic_notify(&socket_three, socket_three.value);
 }
 
 
