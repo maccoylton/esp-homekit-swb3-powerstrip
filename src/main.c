@@ -86,10 +86,10 @@ const int SOCKET_THREE_GPIO = 5;
 const int SOCKET_ONE_GPIO = 12;
 const int SOCKET_TWO_GPIO = 14;
 const int SOCKET_USB_GPIO = 15;
+
 int led_off_value=0; /* global varibale to support LEDs set to 0 where the LED is connected to GND, 1 where +3.3v */
 
-
-const int status_led_gpio = 0; /*set the gloabl variable for the led to be sued for showing status */
+const int status_led_gpio = 0; /*set the gloabl variable for the led to be used for showing status */
 
 
 void socket_one_callback (homekit_characteristic_t *_ch, homekit_value_t on, void *context){
@@ -211,9 +211,6 @@ homekit_accessory_t *accessories[] = {
         HOMEKIT_SERVICE(SWITCH, .primary=true, .characteristics=(homekit_characteristic_t*[]){
             HOMEKIT_CHARACTERISTIC(NAME, "Socket 1"),
             &socket_one,
-            &ota_trigger,
-            &wifi_reset,
-            &task_stats,
             NULL
         }),
         HOMEKIT_SERVICE(SWITCH, .primary=false, .characteristics=(homekit_characteristic_t*[]){
@@ -229,6 +226,9 @@ homekit_accessory_t *accessories[] = {
         HOMEKIT_SERVICE(SWITCH, .primary=false, .characteristics=(homekit_characteristic_t*[]){
             HOMEKIT_CHARACTERISTIC(NAME, "Socket USB"),
             &socket_usb,
+            &ota_trigger,
+            &wifi_reset,
+            &task_stats,
             NULL
         }),
         NULL
