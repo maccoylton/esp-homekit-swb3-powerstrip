@@ -1,3 +1,6 @@
+![GitHub All Releases](https://img.shields.io/github/downloads/maccoylton/esp-homekit-swb3-powerstrip/total) 
+![GitHub Releases](https://img.shields.io/github/downloads/maccoylton/esp-homekit-swb3-powerstrip/latest/total)
+
 # esp-homekit-swb3-powerstrip
 Homekit firmware for SWb3 powerstrip
 
