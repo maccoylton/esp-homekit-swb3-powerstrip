@@ -2,6 +2,9 @@ esp-homekit-swb3-powerstrip.xcodeproj/
 build/
 firmware/
 src/.DS_Store
+../.DS_Store
 src/udplog-client
 src/hkconfig.bin
 .DS_Store
+latest-pre-release
+src/latest-pre-release
