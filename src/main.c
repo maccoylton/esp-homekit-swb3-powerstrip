@@ -74,16 +74,16 @@ homekit_characteristic_t model        = HOMEKIT_CHARACTERISTIC_(MODEL,         D
 homekit_characteristic_t revision     = HOMEKIT_CHARACTERISTIC_(FIRMWARE_REVISION,  FW_VERSION);
 
 homekit_characteristic_t socket_one   = HOMEKIT_CHARACTERISTIC_(
-                                                             ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_one_callback)
+                                                             ON, false, .description ="socket one", .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_one_callback)
                                                              );
 homekit_characteristic_t socket_two  = HOMEKIT_CHARACTERISTIC_(
-                                                                ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_two_callback)
+                                                                ON, false, .description ="socket two",.callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_two_callback)
                                                                 );
 homekit_characteristic_t socket_three   = HOMEKIT_CHARACTERISTIC_(
-                                                                ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_three_callback)
+                                                                ON, false, .description ="socket three",.callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_three_callback)
                                                                 );
 homekit_characteristic_t socket_usb   = HOMEKIT_CHARACTERISTIC_(
-                                                                ON, false, .callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_usb_callback)
+                                                                ON, false, .description ="socket usb",.callback=HOMEKIT_CHARACTERISTIC_CALLBACK(socket_usb_callback)
                                                                 );
 const int LED_GPIO = 0;
 const int LED_2_GPIO = 2;
@@ -130,7 +130,6 @@ void button_single_press_callback(uint8_t gpio, void* args, uint8_t param) {
     relay_write(socket_one.value.bool_value, SOCKET_ONE_GPIO);
     homekit_characteristic_notify(&socket_one, socket_one.value);
     sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
-
     
 }
 
@@ -242,7 +241,9 @@ homekit_accessory_t *accessories[] = {
             &socket_usb,
             &ota_trigger,
             &wifi_reset,
+            &wifi_check_interval,
             &task_stats,
+            &preserve_state,
             NULL
         }),
         NULL
@@ -259,6 +260,36 @@ void accessory_init_not_paired (void) {
 void accessory_init (void ){
 /* initalise anything you don't want started until wifi and pairing is confirmed */
     
+    printf ("%s:\n", __func__);
+    if ( preserve_state.value.bool_value == true){
+        printf ("%s:Loading preserved state\n", __func__);
+        
+        load_characteristic_from_flash(&socket_one);
+        relay_write(socket_one.value.bool_value, SOCKET_ONE_GPIO);
+        
+        load_characteristic_from_flash(&socket_two);
+        relay_write(socket_two.value.bool_value, SOCKET_TWO_GPIO);
+
+        
+        load_characteristic_from_flash(&socket_three);
+        relay_write(socket_three.value.bool_value, SOCKET_THREE_GPIO);
+
+        
+        load_characteristic_from_flash(&socket_usb);
+        relay_write(socket_usb.value.bool_value, SOCKET_USB_GPIO);
+
+        
+        load_characteristic_from_flash(&wifi_check_interval);
+    } else {
+        printf ("%s:Preserved state is off\n", __func__);
+    }
+    homekit_characteristic_notify(&preserve_state, preserve_state.value);
+    homekit_characteristic_notify(&wifi_check_interval, wifi_check_interval.value);
+    homekit_characteristic_notify(&socket_one, socket_one.value);
+    homekit_characteristic_notify(&socket_two, socket_two.value);
+    homekit_characteristic_notify(&socket_three, socket_three.value);
+    homekit_characteristic_notify(&socket_usb, socket_usb.value);
+
 }
 
 
@@ -279,6 +310,7 @@ void save_characteristics (){
         save_characteristic_to_flash(&socket_one, socket_one.value);
         save_characteristic_to_flash(&socket_two, socket_two.value);
         save_characteristic_to_flash(&socket_three , socket_three.value);
+        save_characteristic_to_flash(&socket_usb , socket_usb.value);
         save_characteristic_to_flash(&wifi_check_interval, wifi_check_interval.value);
     } else {
         printf ("%s:Not preserving state\n", __func__);
