@@ -54,13 +54,19 @@ void socket_usb_callback (homekit_characteristic_t *_ch, homekit_value_t on, voi
 
 #include <ota-api.h>
 
+#define SAVE_DELAY 1000
 
+homekit_characteristic_t wifi_reset   = HOMEKIT_CHARACTERISTIC_(CUSTOM_WIFI_RESET, false, .setter=wifi_reset_set);
 homekit_characteristic_t wifi_check_interval   = HOMEKIT_CHARACTERISTIC_(CUSTOM_WIFI_CHECK_INTERVAL, 10, .setter=wifi_check_interval_set);
 /* checks the wifi is connected and flashes status led to indicated connected */
 homekit_characteristic_t task_stats   = HOMEKIT_CHARACTERISTIC_(CUSTOM_TASK_STATS, false , .setter=task_stats_set);
 
+homekit_characteristic_t ota_beta     = HOMEKIT_CHARACTERISTIC_(CUSTOM_OTA_BETA, false, .setter=ota_beta_set);
+homekit_characteristic_t lcm_beta    = HOMEKIT_CHARACTERISTIC_(CUSTOM_LCM_BETA, false, .setter=lcm_beta_set);
+homekit_characteristic_t preserve_state   = HOMEKIT_CHARACTERISTIC_(CUSTOM_PRESERVE_STATE, false, .setter=preserve_state_set);
+
+
 homekit_characteristic_t ota_trigger  = API_OTA_TRIGGER;
-homekit_characteristic_t wifi_reset   = HOMEKIT_CHARACTERISTIC_(CUSTOM_WIFI_RESET, false, .setter=wifi_reset_set);
 homekit_characteristic_t name         = HOMEKIT_CHARACTERISTIC_(NAME, DEVICE_NAME);
 homekit_characteristic_t manufacturer = HOMEKIT_CHARACTERISTIC_(MANUFACTURER,  DEVICE_MANUFACTURER);
 homekit_characteristic_t serial       = HOMEKIT_CHARACTERISTIC_(SERIAL_NUMBER, DEVICE_SERIAL);
@@ -93,23 +99,27 @@ const int status_led_gpio = 0; /*set the gloabl variable for the led to be used 
 
 
 void socket_one_callback (homekit_characteristic_t *_ch, homekit_value_t on, void *context){
-    printf("Socket one callback\n");
+    printf("%s:\n", __func__);
     relay_write(socket_one.value.bool_value, SOCKET_ONE_GPIO);
 }
 
 void socket_two_callback (homekit_characteristic_t *_ch, homekit_value_t on, void *context){
     printf("Socket two callback\n");
     relay_write(socket_two.value.bool_value, SOCKET_TWO_GPIO);
+    sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
 }
 
 void socket_three_callback (homekit_characteristic_t *_ch, homekit_value_t on, void *context){
     printf("Socket three callback\n");
     relay_write(socket_three.value.bool_value, SOCKET_THREE_GPIO);
+    sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
 }
 
 void socket_usb_callback (homekit_characteristic_t *_ch, homekit_value_t on, void *context){
     printf("Socket usb callback\n");
     relay_write(socket_usb.value.bool_value, SOCKET_USB_GPIO);
+    sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
+
 }
 
 void button_single_press_callback(uint8_t gpio, void* args, uint8_t param) {
@@ -119,6 +129,7 @@ void button_single_press_callback(uint8_t gpio, void* args, uint8_t param) {
     socket_one.value.bool_value = !socket_one.value.bool_value;
     relay_write(socket_one.value.bool_value, SOCKET_ONE_GPIO);
     homekit_characteristic_notify(&socket_one, socket_one.value);
+    sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
 
     
 }
@@ -142,6 +153,9 @@ void button_double_press_callback(uint8_t gpio, void* args, uint8_t param) {
     socket_three.value.bool_value = !socket_three.value.bool_value;
     relay_write(socket_three.value.bool_value, SOCKET_THREE_GPIO);
     homekit_characteristic_notify(&socket_three, socket_three.value);
+    
+    sdk_os_timer_arm (&save_timer, SAVE_DELAY, 0 );
+
 }
 
 
@@ -165,7 +179,7 @@ void gpio_init() {
     adv_button_set_evaluate_delay(10);
 
     /* GPIO for button, pull-up resistor, inverted */
-    printf("Initialising buttons\n");
+    printf("%s: Initialising buttons\n", __func__);
     adv_button_create(BUTTON_GPIO, true, false);
     adv_button_register_callback_fn(BUTTON_GPIO, button_single_press_callback, SINGLEPRESS_TYPE, NULL, 0);
     adv_button_register_callback_fn(BUTTON_GPIO, button_double_press_callback, DOUBLEPRESS_TYPE, NULL, 0);
@@ -246,6 +260,31 @@ void accessory_init (void ){
 /* initalise anything you don't want started until wifi and pairing is confirmed */
     
 }
+
+
+void recover_from_reset (int reason){
+    /* called if we restarted abnormally */
+    printf ("%s: reason %d\n", __func__, reason);
+}
+
+
+void save_characteristics (){
+    
+    /* called if we restarted abnormally */
+    printf ("%s:\n", __func__);
+    
+    save_characteristic_to_flash(&preserve_state, preserve_state.value);
+    if ( preserve_state.value.bool_value == true){
+        printf ("%s:Preserving state\n", __func__);
+        save_characteristic_to_flash(&socket_one, socket_one.value);
+        save_characteristic_to_flash(&socket_two, socket_two.value);
+        save_characteristic_to_flash(&socket_three , socket_three.value);
+        save_characteristic_to_flash(&wifi_check_interval, wifi_check_interval.value);
+    } else {
+        printf ("%s:Not preserving state\n", __func__);
+    }
+}
+
 
 homekit_server_config_t config = {
     .accessories = accessories,

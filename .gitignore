@@ -3,4 +3,5 @@ build/
 firmware/
 src/.DS_Store
 src/udplog-client
+src/hkconfig.bin
 .DS_Store
